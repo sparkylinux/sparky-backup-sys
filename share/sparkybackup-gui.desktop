@@ -1,0 +1,15 @@
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Name=Sparky Backup System
+GenericName=Sparky Backup System
+Comment=SparkyLinux system backup tool
+Comment[pl_PL]=Narzędzie do tworzenia kopii zapasowej SparkyLinux
+Exec=remsu /usr/bin/sparkybackup-gui
+Icon=/usr/share/icons/sparky/sparkybackupsys/sparky.png
+Terminal=false
+MultipleArgs=false
+Type=Application
+Categories=Applications;System
+GenericName[en_US]=Sparky Backup System
+

@@ -1,0 +1,271 @@
+#!/bin/bash
+
+#  remastersys-gui script can make an installable livecd/dvd
+#  from a Debian installed and customized system
+#  Created by Tony "Fragadelic" Brijeski
+#  Copyright 2007-2012 Under the GNU GPL2 License
+#  Created October 28th, 2007,2008
+#  Updated July 2012
+#
+#  Forked for SparkyLinux by pavroo <pavroo@onet.eu> 2013/08/05
+#  Last update 2017/03/22
+#  Copyright 2013-2017 Under the GNU GPL2 License
+#
+#  This script requires yad to run
+
+DIALOG550="yad --window-icon=/usr/share/icons/sparky/sparkybackupsys/sparky.png --width=550 --height=350 --center"
+DIALOG="yad --window-icon=/usr/share/icons/sparky/sparkybackupsys/sparky.png --center"
+TITLE="--always-print-result --dialog-sep --image=/usr/share/icons/sparky/sparkybackupsys/sparky.png --title="
+TEXT="--text="
+ENTRY="--entry "
+ENTRYTEXT="--entry-text "
+FILESELECTION="--file "
+MENU="--list --column=Pick --column=Info"
+YESNO=" --button=Ok:0 --button=Exit:1 "
+MSGBOX=" --button=Ok:0 "
+TITLETEXT="Sparky Backup System"
+
+if [ -f /opt/sparky/sparky-editor ]; then
+. /opt/sparky/sparky-editor
+else
+SPARKYEDITOR="gnome-text-editor"
+fi
+
+if [ -f /opt/sparky/sparky-xterm ]; then
+. /opt/sparky/sparky-xterm
+else
+SPARKYXTERM="x-terminal-emulator"
+fi
+
+testroot="`whoami`"
+
+if [ "$testroot" != "root" ]; then
+	$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"This must be run with root privileges."
+	exit 1
+fi
+
+# if Live system just quit, do nothing
+TESTMODE=`grep "1000" /etc/passwd | grep -v "Live"`
+
+if [ "$TESTMODE" = "" ]; then
+	$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"It's Live system!\nInstall Sparky on a hard drive then remaster it.\n\nExiting now..."
+	exit 1
+fi
+
+mainmenu () {
+
+CHOICES=`$DIALOG550 $TITLE"$TITLETEXT" $YESNO $MENU $TEXT"Please Select an option:" \
+Info "About Sparky Backup System" \
+EFI "Read this if you'd like to add support for EFI machines " \
+Edit_Backup "Edit the sparkybackup configuration file" \
+Edit_Installer "Edit the sparkylinux-installer configuration file" \
+Clean_Cache "Clean up all DEB packages to reduce iso image size" \
+ISO "Create a backup ISO image for live user" \
+Clear "Clear out all copied files from the working folders" \
+Viewlog "View the backup log file"`
+
+if [ "$?" = "0" ]; then
+	CHOICE=`echo $CHOICES | cut -d "|" -f 1`
+else
+	exit 0
+fi
+
+if [ "$CHOICE" = "ISO" ]; then
+	isomenu
+elif [ "$CHOICE" = "Clear" ]; then
+	clearmenu
+elif [ "$CHOICE" = "Edit_Backup" ]; then
+	$SPARKYEDITOR /etc/sparkybackup/sparkybackup.conf
+	mainmenu
+elif [ "$CHOICE" = "Edit_Installer" ]; then
+	$SPARKYEDITOR /etc/sparkybackup/sparkylinux-installer.conf
+	mainmenu
+elif [ "$CHOICE" = "Clean_Cache" ]; then
+	cleandebmenu
+elif [ "$CHOICE" = "Viewlog" ]; then
+. /etc/sparkybackup/sparkybackup.conf
+	if [ -f "$WORKDIR/sparkybackup-sys/sparkybackup.log" ]; then
+		$DIALOG $TITLE"$TITLETEXT" --width=600 --height=400 --text-info --filename="$WORKDIR/sparkybackup-sys/sparkybackup.log"
+	else
+		$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"The sparkybackup.log file does not exist"
+	fi
+mainmenu
+elif [ "$CHOICE" = "Info" ]; then
+. /etc/sparkybackup/sparkybackup.version
+$DIALOG550 $TITLE"$TITLETEXT" $MSGBOX $TEXT"SparkyBackup is a tool which can make \n\
+a copy of your present installation of SparkyLinux, \n\
+including all extra packages you have already installed. \n\
+\n\
+It will not copy web browsers, IM and other applications \n\
+personal settings, e-mails and files you created. \n\
+It will make a bootable iso image which can be burnt \n\
+on a blank CD/DVD or copy on an USB stick. \n\
+\n\
+The script can be also run in a text mode by the command: \n\
+sudo sparkybackup /option/ \n\
+\n\
+Sparky Backup System is based on Remastersys-Gui, \n\
+Sparky Backup Core is based on Remastersys \n\
+and published under GNU GPLv2 License.\n\
+\n\
+The GUI uses Sparky Backup System version $SPARKYBACKUPVERSION \n\
+Bugs and suggestions can be reported at http://sparkylinux.org/forum"
+mainmenu
+elif [ "$CHOICE" = "EFI" ]; then
+. /etc/sparkybackup/sparkybackup.version
+$DIALOG550 $TITLE"$TITLETEXT" $MSGBOX $TEXT"If you would like to build a new iso image \n\
+which can be run on machines feature EFI motherboard, do: \n\n\
+1. Download 6 DEB files from Debian TESTING repository (amd64 or i386): \n\
+- efibootmgr \n\
+- grub-efi \n\
+- grub-efi-amd64 (or ia32) \n\
+- grub-efi-amd64-bin (or ia32) \n\
+- libefivar1 \n\
+- libefiboot1 \n\
+\n\
+2. Move all of the 64 (or 32) bit packages to the directory: /home/offline \n\
+\n\
+3. Install 'live-installer' if you wish. \n\
+Anyway Sparky Advanced Installer provides UEFI support too. \n\
+\n\
+Starting from SparkyLinux version 4.0, the tool \n\
+supports 32 and 64 bit machines with UEFI motherboard."
+mainmenu
+else
+	exit 0
+fi
+
+}
+
+isomenu () {
+
+$DIALOG $TITLE"$TITLETEXT" $YESNO $TEXT"This will copy your desktop settings \nso they become the default for the live system. \n\nThis includes desktop background and other personalized \ndesktop settings that aren't hardcoded to the current \nusers home folder. \nNeed to compile a list of valid users. \n\nIt may take a few seconds to complete so be patient. \nDo you want to continue?"
+
+if [ "$?" != "0" ]; then
+$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"Nothing has been done! \nClick OK to close the window."
+exit 0 
+
+else
+
+j="0"
+i="1000"
+while [ "`cat /etc/passwd | awk -F ":" '{print $3}' | grep $i`" != "" ]; do
+for i in $(seq 1000 1 1010); do
+
+if [ "`cat /etc/passwd | awk -F ":" '{print $3}' | grep $i`" != "" ]; then
+  userchoice[$j]="`grep $i /etc/passwd | awk -F ":" '{print $1}'`"
+  
+  j=`expr $j + 1`
+fi
+
+done
+done
+
+SKELUSER=`$DIALOG $TITLE"$TITLETEXT" $MENU $TEXT"\nPlease select a user whose \
+settings \nyou would like to make the default." $MSGBOX \
+${userchoice[0]} ${userchoice[0]} \
+${userchoice[1]} ${userchoice[1]} \
+${userchoice[2]} ${userchoice[2]} \
+${userchoice[3]} ${userchoice[3]} \
+${userchoice[4]} ${userchoice[4]} \
+${userchoice[5]} ${userchoice[5]} \
+${userchoice[6]} ${userchoice[6]} \
+${userchoice[7]} ${userchoice[7]} \
+${userchoice[8]} ${userchoice[8]} \
+${userchoice[9]} ${userchoice[9]}`
+
+SKELUSER=`echo $SKELUSER | cut -d "|" -f 1`
+
+if [ "$SKELUSER" != "" ]; then
+
+cd `grep "^$SKELUSER:" /etc/passwd | awk -F ":" '{print $6}'`
+
+PWD=`pwd`
+
+TESTUSER=`grep "$PWD" /etc/passwd | awk -F ":" '{print $1}'`
+
+if [ "$TESTUSER" != "$SKELUSER" ]; then
+$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"The user you chose does not have \
+a proper home directory.  \nClick OK to return to the main menu."
+echo need to be in the user directory....exiting
+mainmenu
+fi
+
+$DIALOG $TITLE"$TITLETEXT" --no-buttons --progress --pulsate $TEXT"Copying your $SKELUSER user settings now. \n\
+Please wait." &
+
+sparkybackup-skelcopy $SKELUSER
+
+killall -KILL yad
+
+$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"The settings for $SKELUSER have been copied.\nClick OK to create a backup iso now.\n\nDo not interrupt this process.\n\nClick OK to Start the Backup LiveCD/DVD process."
+
+else
+
+$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"You didn't select any user. \n\nClick OK to continue."
+mainmenu
+
+fi
+
+# create dist custom iso
+$SPARKYXTERM -e "sparkybackup dist"
+. /etc/sparkybackup/sparkybackup.conf
+
+SQUASHFSSIZE=`ls -s $WORKDIR/sparkybackup-sys/ISOTMP/live/filesystem.squashfs | awk -F " " '{print $1}'`
+if [ "$SQUASHFSSIZE" -gt "3999999" ]; then
+$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"The compressed filesystem is larger than the \niso9660 specification allows for a single file.\n\nYou must try to reduce the amount of data you \nare backing up and try again."
+exit 1
+fi
+$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"Your new files:\n$CUSTOMISO \n$CUSTOMISO.allsums.txt \n$CUSTOMISO.package-list.txt \nare ready in the directory: \n$WORKDIR/sparkybackup-sys \n\nIt is recommended to test it in a virtual machine or \non a rewritable cd/dvd to ensure it works as desired.\n\nClick on OK to return to the main menu."
+fi
+
+mainmenu
+
+}
+
+cleandebmenu () {
+$DIALOG $TITLE"$TITLETEXT" $YESNO $TEXT"This will remove all spare and downloaded DEB packages by APT.\n Do you want to make cleaning now?"
+
+if [ "$?" != "0" ]; then
+$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"Nothing has been done! \nClick OK to close the window."
+mainmenu
+
+else
+$SPARKYXTERM -e "apt-get autoremove -y"
+apt-get clean
+
+mainmenu
+fi
+
+}
+
+clearmenu () {
+$DIALOG $TITLE"$TITLETEXT" $YESNO $TEXT"This will remove all the copied files from the working directories.\n Do you want to make cleaning now?"
+
+if [ "$?" != "0" ]; then
+	$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"Nothing has been done! \nClick OK to close the window."
+	mainmenu
+
+else
+
+	if [ -d /etc/skel ]; then
+		rm -rf /etc/skel
+		mkdir /etc/skel
+	fi
+
+	if [ -d /usr/share/sparky-desktop-data/openbox/skel ]; then
+		cp /usr/share/sparky-desktop-data/openbox/skel/.bash_logout /etc/skel/.bash_logout
+		cp /usr/share/sparky-desktop-data/openbox/skel/.bashrc /etc/skel/.bashrc
+		cp /usr/share/sparky-desktop-data/openbox/skel/.profile /etc/skel/.profile
+	fi
+
+	rm -rf /home/sparkybackup-sys
+
+	$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"Cleaning completed. \nClick OK to return to the main menu."
+fi
+
+mainmenu
+
+}
+
+mainmenu

@@ -1,0 +1,1 @@
+?package(sparky-backup-sys):needs="X11" section="Applications/System"        title="Sparky Backup System" command="remsu /usr/bin/sparkybackup-gui" icon="/usr/share/icons/sparky/sparkybackupsys/sparky.png"
