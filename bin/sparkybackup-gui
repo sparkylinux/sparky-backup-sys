@@ -8,13 +8,21 @@
 #  Updated July 2012
 #
 #  Forked for SparkyLinux by pavroo <pavroo@onet.eu> 2013/08/05
-#  Last update 2017/03/22
-#  Copyright 2013-2017 Under the GNU GPL2 License
+#  Copyright 2013-2018 Under the GNU GPL2 License
+#  Last update 2018/03/27
 #
 #  This script requires yad to run
 
-DIALOG550="yad --window-icon=/usr/share/icons/sparky/sparkybackupsys/sparky.png --width=550 --height=350 --center"
-DIALOG="yad --window-icon=/usr/share/icons/sparky/sparkybackupsys/sparky.png --center"
+# get default's locale file
+DEFLOCDIR="/usr/share/sparky/sparky-backup-sys"
+if [ "`cat /etc/default/locale | grep pl_PL`" != "" ]; then
+. $DEFLOCDIR/pl
+else
+. $DEFLOCDIR/en
+fi
+
+DIALOG550="yad --window-icon=/usr/share/icons/sparky/sparkybackupsys/sparky.png --width=550 --height=350 --fixed --center"
+DIALOG="yad --window-icon=/usr/share/icons/sparky/sparkybackupsys/sparky.png --fixed --center"
 TITLE="--always-print-result --dialog-sep --image=/usr/share/icons/sparky/sparkybackupsys/sparky.png --title="
 TEXT="--text="
 ENTRY="--entry "
@@ -25,22 +33,21 @@ YESNO=" --button=Ok:0 --button=Exit:1 "
 MSGBOX=" --button=Ok:0 "
 TITLETEXT="Sparky Backup System"
 
-if [ -f /opt/sparky/sparky-editor ]; then
-. /opt/sparky/sparky-editor
+if [ -f /usr/bin/sparky-editor ]; then
+	SPARKYEDITOR="sparky-editor"
 else
-SPARKYEDITOR="gnome-text-editor"
+	SPARKYEDITOR="gnome-text-editor"
 fi
 
-if [ -f /opt/sparky/sparky-xterm ]; then
-. /opt/sparky/sparky-xterm
+if [ -f /usr/bin/sparky-terminal ]; then
+	SPARKYXTERM="sparky-terminal"
 else
-SPARKYXTERM="x-terminal-emulator"
+	SPARKYXTERM="x-terminal-emulator"
 fi
 
 testroot="`whoami`"
-
 if [ "$testroot" != "root" ]; then
-	$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"This must be run with root privileges."
+	$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"$LOCAL1 $LOCAL2"
 	exit 1
 fi
 
@@ -48,21 +55,21 @@ fi
 TESTMODE=`grep "1000" /etc/passwd | grep -v "Live"`
 
 if [ "$TESTMODE" = "" ]; then
-	$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"It's Live system!\nInstall Sparky on a hard drive then remaster it.\n\nExiting now..."
+	$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"$LOCAL3\n$LOCAL4\n\n$LOCAL2"
 	exit 1
 fi
 
 mainmenu () {
 
-CHOICES=`$DIALOG550 $TITLE"$TITLETEXT" $YESNO $MENU $TEXT"Please Select an option:" \
-Info "About Sparky Backup System" \
-EFI "Read this if you'd like to add support for EFI machines " \
-Edit_Backup "Edit the sparkybackup configuration file" \
-Edit_Installer "Edit the sparkylinux-installer configuration file" \
-Clean_Cache "Clean up all DEB packages to reduce iso image size" \
-ISO "Create a backup ISO image for live user" \
-Clear "Clear out all copied files from the working folders" \
-Viewlog "View the backup log file"`
+CHOICES=`$DIALOG550 $TITLE"$TITLETEXT" $YESNO $MENU $TEXT"$LOCAL5" \
+Info "$LOCAL6" \
+EFI "$LOCAL7" \
+Edit_Backup "$LOCAL8" \
+Edit_Installer "$LOCAL9" \
+Clean_Cache "$LOCAL10" \
+ISO "$LOCAL11" \
+Clear "$LOCAL12" \
+Viewlog "$LOCAL13"`
 
 if [ "$?" = "0" ]; then
 	CHOICE=`echo $CHOICES | cut -d "|" -f 1`
@@ -87,49 +94,49 @@ elif [ "$CHOICE" = "Viewlog" ]; then
 	if [ -f "$WORKDIR/sparkybackup-sys/sparkybackup.log" ]; then
 		$DIALOG $TITLE"$TITLETEXT" --width=600 --height=400 --text-info --filename="$WORKDIR/sparkybackup-sys/sparkybackup.log"
 	else
-		$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"The sparkybackup.log file does not exist"
+		$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"$LOCAL14"
 	fi
 mainmenu
 elif [ "$CHOICE" = "Info" ]; then
 . /etc/sparkybackup/sparkybackup.version
-$DIALOG550 $TITLE"$TITLETEXT" $MSGBOX $TEXT"SparkyBackup is a tool which can make \n\
-a copy of your present installation of SparkyLinux, \n\
-including all extra packages you have already installed. \n\
+$DIALOG550 $TITLE"$TITLETEXT" $MSGBOX $TEXT"$LOCAL15 \n\
+$LOCAL16 \n\
+$LOCAL17 \n\
 \n\
-It will not copy web browsers, IM and other applications \n\
-personal settings, e-mails and files you created. \n\
-It will make a bootable iso image which can be burnt \n\
-on a blank CD/DVD or copy on an USB stick. \n\
+$LOCAL18 \n\
+$LOCAL19 \n\
+$LOCAL20 \n\
+$LOCAL21 \n\
 \n\
-The script can be also run in a text mode by the command: \n\
-sudo sparkybackup /option/ \n\
+$LOCAL22 \n\
+sudo sparkybackup /$LOCAL23/ \n\
 \n\
-Sparky Backup System is based on Remastersys-Gui, \n\
-Sparky Backup Core is based on Remastersys \n\
-and published under GNU GPLv2 License.\n\
+$LOCAL24 \n\
+$LOCAL25 \n\
+$LOCAL26\n\
 \n\
-The GUI uses Sparky Backup System version $SPARKYBACKUPVERSION \n\
-Bugs and suggestions can be reported at http://sparkylinux.org/forum"
+$LOCAL27 $SPARKYBACKUPVERSION \n\
+$LOCAL28 https://sparkylinux.org/forum"
 mainmenu
 elif [ "$CHOICE" = "EFI" ]; then
 . /etc/sparkybackup/sparkybackup.version
-$DIALOG550 $TITLE"$TITLETEXT" $MSGBOX $TEXT"If you would like to build a new iso image \n\
-which can be run on machines feature EFI motherboard, do: \n\n\
-1. Download 6 DEB files from Debian TESTING repository (amd64 or i386): \n\
+$DIALOG550 $TITLE"$TITLETEXT" $MSGBOX $TEXT"$LOCAL29 \n\
+$LOCAL30 \n\n\
+1. $LOCAL31 \n\
 - efibootmgr \n\
 - grub-efi \n\
-- grub-efi-amd64 (or ia32) \n\
-- grub-efi-amd64-bin (or ia32) \n\
+- grub-efi-amd64 ($LOCAL32 ia32) \n\
+- grub-efi-amd64-bin ($LOCAL32 ia32) \n\
 - libefivar1 \n\
 - libefiboot1 \n\
 \n\
-2. Move all of the 64 (or 32) bit packages to the directory: /home/offline \n\
+2. $LOCAL33 /home/offline \n\
 \n\
-3. Install 'live-installer' if you wish. \n\
-Anyway Sparky Advanced Installer provides UEFI support too. \n\
+3. $LOCAL34 \n\
+$LOCAL35 \n\
 \n\
-Starting from SparkyLinux version 4.0, the tool \n\
-supports 32 and 64 bit machines with UEFI motherboard."
+$LOCAL36 \n\
+$LOCAL37"
 mainmenu
 else
 	exit 0
@@ -139,10 +146,10 @@ fi
 
 isomenu () {
 
-$DIALOG $TITLE"$TITLETEXT" $YESNO $TEXT"This will copy your desktop settings \nso they become the default for the live system. \n\nThis includes desktop background and other personalized \ndesktop settings that aren't hardcoded to the current \nusers home folder. \nNeed to compile a list of valid users. \n\nIt may take a few seconds to complete so be patient. \nDo you want to continue?"
+$DIALOG $TITLE"$TITLETEXT" $YESNO $TEXT"$LOCAL38 \n$LOCAL39 \n\n$LOCAL40 \n$LOCAL41 \n$LOCAL42 \n$LOCAL43 \n\n$LOCAL44 \n$LOCAL45"
 
 if [ "$?" != "0" ]; then
-$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"Nothing has been done! \nClick OK to close the window."
+$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"$LOCAL46 \n$LOCAL47"
 exit 0 
 
 else
@@ -161,8 +168,7 @@ fi
 done
 done
 
-SKELUSER=`$DIALOG $TITLE"$TITLETEXT" $MENU $TEXT"\nPlease select a user whose \
-settings \nyou would like to make the default." $MSGBOX \
+SKELUSER=`$DIALOG $TITLE"$TITLETEXT" $MENU $TEXT"\n$LOCAL48 \n$LOCAL49" $MSGBOX \
 ${userchoice[0]} ${userchoice[0]} \
 ${userchoice[1]} ${userchoice[1]} \
 ${userchoice[2]} ${userchoice[2]} \
@@ -185,24 +191,23 @@ PWD=`pwd`
 TESTUSER=`grep "$PWD" /etc/passwd | awk -F ":" '{print $1}'`
 
 if [ "$TESTUSER" != "$SKELUSER" ]; then
-$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"The user you chose does not have \
-a proper home directory.  \nClick OK to return to the main menu."
+$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"$LOCAL50 \n$LOCAL51"
 echo need to be in the user directory....exiting
 mainmenu
 fi
 
-$DIALOG $TITLE"$TITLETEXT" --no-buttons --progress --pulsate $TEXT"Copying your $SKELUSER user settings now. \n\
-Please wait." &
+$DIALOG $TITLE"$TITLETEXT" --no-buttons --progress --pulsate $TEXT"$LOCAL52 $SKELUSER $LOCAL53 \n\
+$LOCAL54" &
 
 sparkybackup-skelcopy $SKELUSER
 
 killall -KILL yad
 
-$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"The settings for $SKELUSER have been copied.\nClick OK to create a backup iso now.\n\nDo not interrupt this process.\n\nClick OK to Start the Backup LiveCD/DVD process."
+$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"$LOCAL55 $SKELUSER $LOCAL56\n$LOCAL57\n\n$LOCAL58\n\n$LOCAL59"
 
 else
 
-$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"You didn't select any user. \n\nClick OK to continue."
+$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"$LOCAL60 \n\n$LOCAL61"
 mainmenu
 
 fi
@@ -213,10 +218,10 @@ $SPARKYXTERM -e "sparkybackup dist"
 
 SQUASHFSSIZE=`ls -s $WORKDIR/sparkybackup-sys/ISOTMP/live/filesystem.squashfs | awk -F " " '{print $1}'`
 if [ "$SQUASHFSSIZE" -gt "3999999" ]; then
-$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"The compressed filesystem is larger than the \niso9660 specification allows for a single file.\n\nYou must try to reduce the amount of data you \nare backing up and try again."
+$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"$LOCAL62 \n$LOCAL63\n\n$LOCAL64 \n$LOCAL65"
 exit 1
 fi
-$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"Your new files:\n$CUSTOMISO \n$CUSTOMISO.allsums.txt \n$CUSTOMISO.package-list.txt \nare ready in the directory: \n$WORKDIR/sparkybackup-sys \n\nIt is recommended to test it in a virtual machine or \non a rewritable cd/dvd to ensure it works as desired.\n\nClick on OK to return to the main menu."
+$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"$LOCAL66\n$CUSTOMISO \n$CUSTOMISO.allsums.txt \n$CUSTOMISO.package-list.txt \n$LOCAL67 \n$WORKDIR/sparkybackup-sys \n\n$LOCAL68 \n$LOCAL69\n\n$LOCAL51"
 fi
 
 mainmenu
@@ -224,15 +229,19 @@ mainmenu
 }
 
 cleandebmenu () {
-$DIALOG $TITLE"$TITLETEXT" $YESNO $TEXT"This will remove all spare and downloaded DEB packages by APT.\n Do you want to make cleaning now?"
+$DIALOG $TITLE"$TITLETEXT" $YESNO $TEXT"$LOCAL70\n $LOCAL71"
 
 if [ "$?" != "0" ]; then
-$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"Nothing has been done! \nClick OK to close the window."
+$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"$LOCAL46 \n$LOCAL47"
 mainmenu
 
 else
-$SPARKYXTERM -e "apt-get autoremove -y"
-apt-get clean
+$SPARKYXTERM -e "apt-get autoremove -y && apt-get clean"
+
+TESTAPTITUDE="`which aptitude`"
+if [ "$TESTAPTITUDE" != "" ]; then
+	$SPARKYXTERM -e "aptitude purge ~c"
+fi
 
 mainmenu
 fi
@@ -240,10 +249,10 @@ fi
 }
 
 clearmenu () {
-$DIALOG $TITLE"$TITLETEXT" $YESNO $TEXT"This will remove all the copied files from the working directories.\n Do you want to make cleaning now?"
+$DIALOG $TITLE"$TITLETEXT" $YESNO $TEXT"$LOCAL73\n $LOCAL71"
 
 if [ "$?" != "0" ]; then
-	$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"Nothing has been done! \nClick OK to close the window."
+	$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"$LOCAL46 \n$LOCAL47"
 	mainmenu
 
 else
@@ -261,7 +270,7 @@ else
 
 	rm -rf /home/sparkybackup-sys
 
-	$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"Cleaning completed. \nClick OK to return to the main menu."
+	$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"$LOCAL75 \n$LOCAL51"
 fi
 
 mainmenu

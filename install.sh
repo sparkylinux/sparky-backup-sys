@@ -20,6 +20,7 @@ if [ "$1" = "uninstall" ]; then
 	rm -f /usr/share/applications/sparkybackup-gui.desktop
 	rm -f /usr/share/menu/sparky-backup-sys
 	rm -f /usr/lib/sparkycenter/system/sparkybackup-gui.desktop
+	rm -rf /usr/share/sparky/sparky-backup-sys
 else
 	cp bin/sparkybackup-gui /usr/bin/sparkybackup-gui
 	cp bin/sparkybackup-skelcopy /usr/bin/sparkybackup-skelcopy
@@ -29,4 +30,8 @@ else
 		mkdir -p /usr/lib/sparkycenter/system
 	fi
 	cp system/sparkybackup-gui.desktop /usr/lib/sparkycenter/system/sparkybackup-gui.desktop
+	if [ ! -d /usr/share/sparky/sparky-backup-sys ]; then
+		mkdir -p /usr/share/sparky/sparky-backup-sys
+	fi
+	cp lang/* /usr/share/sparky/sparky-backup-sys/
 fi
