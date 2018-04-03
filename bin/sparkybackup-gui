@@ -1,22 +1,26 @@
 #!/bin/bash
 
-#  remastersys-gui script can make an installable livecd/dvd
-#  from a Debian installed and customized system
-#  Created by Tony "Fragadelic" Brijeski
-#  Copyright 2007-2012 Under the GNU GPL2 License
-#  Created October 28th, 2007,2008
-#  Updated July 2012
+# remastersys-gui script can make an installable livecd/dvd
+# from a Debian installed and customized system
+# Created by Tony "Fragadelic" Brijeski
+# Copyright 2007-2012 Under the GNU GPL2 License
+# Created October 28th, 2007,2008
+# Updated July 2012
 #
-#  Forked for SparkyLinux by pavroo <pavroo@onet.eu> 2013/08/05
-#  Copyright 2013-2018 Under the GNU GPL2 License
-#  Last update 2018/03/27
+# Forked for SparkyLinux by pavroo <pavroo@onet.eu> 2013/08/05
+# Copyright 2013-2018 Under the GNU GPL2 License
+# Last update 2018/04/03
 #
-#  This script requires yad to run
+# This script requires yad to run
 
 # get default's locale file
 DEFLOCDIR="/usr/share/sparky/sparky-backup-sys"
-if [ "`cat /etc/default/locale | grep pl_PL`" != "" ]; then
+if [ "`cat /etc/default/locale | grep de_DE`" != "" ]; then
+. $DEFLOCDIR/de
+elif [ "`cat /etc/default/locale | grep pl_PL`" != "" ]; then
 . $DEFLOCDIR/pl
+elif [ "`cat /etc/default/locale | grep pt_BR`" != "" ]; then
+. $DEFLOCDIR/pt_BR
 else
 . $DEFLOCDIR/en
 fi
@@ -39,10 +43,13 @@ else
 	SPARKYEDITOR="gnome-text-editor"
 fi
 
-if [ -f /usr/bin/sparky-terminal ]; then
-	SPARKYXTERM="sparky-terminal"
+if [ -f /usr/bin/sparky-xterm ];then
+	SPARKYXTERM="/usr/bin/sparky-xterm"
+elif [ -f /usr/bin/sparky-terminal ];then
+	SPARKYXTERM="/usr/bin/sparky-terminal -e"
 else
-	SPARKYXTERM="x-terminal-emulator"
+	echo "sparky-xterm is missing... Exiting..."
+	exit 1
 fi
 
 testroot="`whoami`"
@@ -213,7 +220,7 @@ mainmenu
 fi
 
 # create dist custom iso
-$SPARKYXTERM -e "sparkybackup dist"
+$SPARKYXTERM "sparkybackup dist"
 . /etc/sparkybackup/sparkybackup.conf
 
 SQUASHFSSIZE=`ls -s $WORKDIR/sparkybackup-sys/ISOTMP/live/filesystem.squashfs | awk -F " " '{print $1}'`
@@ -236,11 +243,12 @@ $DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"$LOCAL46 \n$LOCAL47"
 mainmenu
 
 else
-$SPARKYXTERM -e "apt-get autoremove -y && apt-get clean"
+$SPARKYXTERM "apt-get autoremove -y"
+$SPARKYXTERM "apt-get clean"
 
 TESTAPTITUDE="`which aptitude`"
 if [ "$TESTAPTITUDE" != "" ]; then
-	$SPARKYXTERM -e "aptitude purge ~c"
+	$SPARKYXTERM "aptitude purge ~c"
 fi
 
 mainmenu
