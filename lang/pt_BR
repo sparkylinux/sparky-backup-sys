@@ -1,8 +1,8 @@
 # English localization file for Sparky Backup Sys.
-# Copyright 2018 PaweÅ‚ "pavroo" Pijanowski <pavroo@onet.eu> 2018/03/27
+# Copyright 2018 Paweł "pavroo" Pijanowski <pavroo@onet.eu> 2018/03/27
 # Under the GNU GPL v2
-# Last update 2018/03/27 by pavroo
 # Translation made by Daniel Campos Ramos 2018/03/27
+# Last update 2018/03/27 by pavroo
 LOCAL1="Precisa ser root..."
 LOCAL2="Saindo agora..."
 LOCAL3="É um sistema Live!"
@@ -84,5 +84,6 @@ LOCAL78="Onde username é um nome de usuário válido no sistema"
 LOCAL79="Limpando os arquivos em /etc/skel que serão copiados"
 LOCAL80="Copiando os arquivos de configurações para /etc/skel"
 LOCAL81="ou não foi encontrado ou ainda não existe um diretório home adequado."
+LOCAL82="Fará uma copia das suas preferencias do desktop para o usuário live"
 ### desktop entry can be translate too ###
 # Comment[pt_BR]=SparkyLinux system backup tool

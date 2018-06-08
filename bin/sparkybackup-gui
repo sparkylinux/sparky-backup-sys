@@ -9,7 +9,7 @@
 #
 # Forked for SparkyLinux by pavroo <pavroo@onet.eu> 2013/08/05
 # Copyright 2013-2018 Under the GNU GPL2 License
-# Last update 2018/05/27
+# Last update 2018/06/07
 #
 # This script requires yad to run
 
@@ -75,12 +75,13 @@ mainmenu () {
 CHOICES=`$DIALOG550 $TITLE"$TITLETEXT" $YESNO $MENU $TEXT"$LOCAL5" \
 Info "$LOCAL6" \
 EFI "$LOCAL7" \
-Edit_Backup "$LOCAL8" \
-Edit_Installer "$LOCAL9" \
-Clean_Cache "$LOCAL10" \
-ISO "$LOCAL11" \
-Clear "$LOCAL12" \
-Viewlog "$LOCAL13"`
+Edit "$LOCAL8" \
+Installer "$LOCAL9" \
+Cache "$LOCAL10" \
+Skel "$LOCAL82" \
+Dist "$LOCAL11" \
+Clean "$LOCAL12" \
+Log "$LOCAL13"`
 
 if [ "$?" = "0" ]; then
 	CHOICE=`echo $CHOICES | cut -d "|" -f 1`
@@ -88,19 +89,21 @@ else
 	exit 0
 fi
 
-if [ "$CHOICE" = "ISO" ]; then
-	isomenu
-elif [ "$CHOICE" = "Clear" ]; then
-	clearmenu
-elif [ "$CHOICE" = "Edit_Backup" ]; then
+if [ "$CHOICE" = "Dist" ]; then
+	distmenu
+elif [ "$CHOICE" = "Skel" ]; then
+	skelmenu
+elif [ "$CHOICE" = "Clean" ]; then
+	cleanmenu
+elif [ "$CHOICE" = "Edit" ]; then
 	$SPARKYEDITOR /etc/sparkybackup/sparkybackup.conf
 	mainmenu
-elif [ "$CHOICE" = "Edit_Installer" ]; then
+elif [ "$CHOICE" = "Installer" ]; then
 	$SPARKYEDITOR /etc/sparkybackup/sparkylinux-installer.conf
 	mainmenu
-elif [ "$CHOICE" = "Clean_Cache" ]; then
-	cleandebmenu
-elif [ "$CHOICE" = "Viewlog" ]; then
+elif [ "$CHOICE" = "Cache" ]; then
+	cachemenu
+elif [ "$CHOICE" = "Log" ]; then
 . /etc/sparkybackup/sparkybackup.conf
 	if [ -f "$WORKDIR/sparkybackup-sys/sparkybackup.log" ]; then
 		$DIALOG $TITLE"$TITLETEXT" --width=600 --height=400 --text-info --filename="$WORKDIR/sparkybackup-sys/sparkybackup.log"
@@ -155,29 +158,28 @@ fi
 
 }
 
-isomenu () {
+skelmenu () {
 
 $DIALOG $TITLE"$TITLETEXT" $YESNO $TEXT"$LOCAL38 \n$LOCAL39 \n\n$LOCAL40 \n$LOCAL41 \n$LOCAL42 \n$LOCAL43 \n\n$LOCAL44 \n$LOCAL45"
 
 if [ "$?" != "0" ]; then
-$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"$LOCAL46 \n$LOCAL47"
-exit 0 
+	$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"$LOCAL46 \n$LOCAL47"
+	exit 0 
 
 else
 
-j="0"
-i="1000"
-while [ "`cat /etc/passwd | awk -F ":" '{print $3}' | grep $i`" != "" ]; do
-for i in $(seq 1000 1 1010); do
+	j="0"
+	i="1000"
+	while [ "`cat /etc/passwd | awk -F ":" '{print $3}' | grep $i`" != "" ]; do
+	for i in $(seq 1000 1 1010); do
 
-if [ "`cat /etc/passwd | awk -F ":" '{print $3}' | grep $i`" != "" ]; then
-  userchoice[$j]="`grep $i /etc/passwd | awk -F ":" '{print $1}'`"
-  
-  j=`expr $j + 1`
-fi
+	if [ "`cat /etc/passwd | awk -F ":" '{print $3}' | grep $i`" != "" ]; then
+		userchoice[$j]="`grep $i /etc/passwd | awk -F ":" '{print $1}'`"
+		j=`expr $j + 1`
+	fi
 
-done
-done
+	done
+	done
 
 SKELUSER=`$DIALOG $TITLE"$TITLETEXT" $MENU $TEXT"\n$LOCAL48 \n$LOCAL49" $MSGBOX \
 ${userchoice[0]} ${userchoice[0]} \
@@ -191,76 +193,89 @@ ${userchoice[7]} ${userchoice[7]} \
 ${userchoice[8]} ${userchoice[8]} \
 ${userchoice[9]} ${userchoice[9]}`
 
-SKELUSER=`echo $SKELUSER | cut -d "|" -f 1`
+	SKELUSER=`echo $SKELUSER | cut -d "|" -f 1`
 
-if [ "$SKELUSER" != "" ]; then
+	if [ "$SKELUSER" != "" ]; then
 
-cd `grep "^$SKELUSER:" /etc/passwd | awk -F ":" '{print $6}'`
+		cd `grep "^$SKELUSER:" /etc/passwd | awk -F ":" '{print $6}'`
+		PWD=`pwd`
+		TESTUSER=`grep "$PWD" /etc/passwd | awk -F ":" '{print $1}'`
 
-PWD=`pwd`
+		if [ "$TESTUSER" != "$SKELUSER" ]; then
+			$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"$LOCAL50 \n$LOCAL51"
+			echo "need to be in the user directory....exiting"
+			mainmenu
+		fi
 
-TESTUSER=`grep "$PWD" /etc/passwd | awk -F ":" '{print $1}'`
-
-if [ "$TESTUSER" != "$SKELUSER" ]; then
-$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"$LOCAL50 \n$LOCAL51"
-echo need to be in the user directory....exiting
-mainmenu
-fi
-
-$DIALOG $TITLE"$TITLETEXT" --no-buttons --progress --pulsate $TEXT"$LOCAL52 $SKELUSER $LOCAL53 \n\
+		$DIALOG $TITLE"$TITLETEXT" --no-buttons --progress --pulsate $TEXT"$LOCAL52 $SKELUSER $LOCAL53 \n\
 $LOCAL54" &
 
-sparkybackup-skelcopy $SKELUSER
+		sparkybackup-skelcopy $SKELUSER
 
-killall -KILL yad
+		killall -KILL yad
 
-$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"$LOCAL55 $SKELUSER $LOCAL56\n$LOCAL57\n\n$LOCAL58\n\n$LOCAL59"
+		$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"$LOCAL55 $SKELUSER $LOCAL56\n\n$LOCAL51"
 
-else
+	else
 
-$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"$LOCAL60 \n\n$LOCAL61"
-mainmenu
+		$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"$LOCAL60 \n\n$LOCAL61"
+		mainmenu
 
-fi
-
-# create dist custom iso
-$SPARKYXTERM "sparkybackup dist"
-. /etc/sparkybackup/sparkybackup.conf
-
-SQUASHFSSIZE=`ls -s $WORKDIR/sparkybackup-sys/ISOTMP/live/filesystem.squashfs | awk -F " " '{print $1}'`
-if [ "$SQUASHFSSIZE" -gt "3999999" ]; then
-$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"$LOCAL62 \n$LOCAL63\n\n$LOCAL64 \n$LOCAL65"
-exit 1
-fi
-$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"$LOCAL66\n$CUSTOMISO \n$CUSTOMISO.allsums.txt \n$CUSTOMISO.package-list.txt \n$LOCAL67 \n$WORKDIR/sparkybackup-sys \n\n$LOCAL68 \n$LOCAL69\n\n$LOCAL51"
+	fi
 fi
 
 mainmenu
 
 }
 
-cleandebmenu () {
+distmenu () {
+# create dist custom iso
+$DIALOG $TITLE"$TITLETEXT" $YESNO $TEXT"$LOCAL57\n\n$LOCAL58\n\n$LOCAL59"
+
+if [ "$?" != "0" ]; then
+	$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"$LOCAL46 \n$LOCAL47"
+	exit 0 
+
+else
+
+. /etc/sparkybackup/sparkybackup.conf
+	$SPARKYXTERM "sparkybackup dist"
+
+	SQUASHFSSIZE=`ls -s $WORKDIR/sparkybackup-sys/ISOTMP/live/filesystem.squashfs | awk -F " " '{print $1}'`
+	if [ "$SQUASHFSSIZE" -gt "3999999" ]; then
+		$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"$LOCAL62 \n$LOCAL63\n\n$LOCAL64 \n$LOCAL65"
+		exit 1
+	fi
+	$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"$LOCAL66\n$CUSTOMISO \n$CUSTOMISO.allsums.txt \n$CUSTOMISO.package-list.txt \n$LOCAL67 \n$WORKDIR/sparkybackup-sys \n\n$LOCAL68 \n$LOCAL69\n\n$LOCAL51"
+
+fi
+
+mainmenu
+
+}
+
+cachemenu () {
 $DIALOG $TITLE"$TITLETEXT" $YESNO $TEXT"$LOCAL70\n $LOCAL71"
 
 if [ "$?" != "0" ]; then
-$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"$LOCAL46 \n$LOCAL47"
-mainmenu
+	$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"$LOCAL46 \n$LOCAL47"
+	mainmenu
 
 else
-$SPARKYXTERM "apt-get autoremove"
-$SPARKYXTERM "apt-get clean"
+	$SPARKYXTERM "apt-get autoremove"
+	$SPARKYXTERM "apt-get clean"
 
-TESTAPTITUDE="`which aptitude`"
-if [ "$TESTAPTITUDE" != "" ]; then
-	$SPARKYXTERM "aptitude purge ~c"
-fi
+	TESTAPTITUDE="`which aptitude`"
+	if [ "$TESTAPTITUDE" != "" ]; then
+		$SPARKYXTERM "aptitude purge ~c"
+	fi
 
 mainmenu
 fi
 
 }
 
-clearmenu () {
+cleanmenu () {
 $DIALOG $TITLE"$TITLETEXT" $YESNO $TEXT"$LOCAL73\n $LOCAL71"
 
 if [ "$?" != "0" ]; then
@@ -269,18 +284,19 @@ if [ "$?" != "0" ]; then
 
 else
 
-	if [ -d /etc/skel ]; then
-		rm -rf /etc/skel
-		mkdir /etc/skel
-	fi
+	#if [ -d /etc/skel ]; then
+	#	rm -rf /etc/skel
+	#	mkdir /etc/skel
+	#fi
 
-	if [ -d /usr/share/sparky-desktop-data/openbox/skel ]; then
-		cp /usr/share/sparky-desktop-data/openbox/skel/.bash_logout /etc/skel/.bash_logout
-		cp /usr/share/sparky-desktop-data/openbox/skel/.bashrc /etc/skel/.bashrc
-		cp /usr/share/sparky-desktop-data/openbox/skel/.profile /etc/skel/.profile
-	fi
+	#if [ -d /usr/share/sparky-desktop-data/openbox/skel ]; then
+	#	cp /usr/share/sparky-desktop-data/openbox/skel/.bash_logout /etc/skel/.bash_logout
+	#	cp /usr/share/sparky-desktop-data/openbox/skel/.bashrc /etc/skel/.bashrc
+	#	cp /usr/share/sparky-desktop-data/openbox/skel/.profile /etc/skel/.profile
+	#fi
 
-	rm -rf /home/sparkybackup-sys
+	#rm -rf /home/sparkybackup-sys
+	rm -rf $WORKDIR
 
 	$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"$LOCAL75 \n$LOCAL51"
 fi

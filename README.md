@@ -30,7 +30,7 @@ coreutils
 gawk
 gparted
 grep
-sparky-backup-core
+sparky-backup-core (>= 20180607)
 sparky-editor
 sparky-remsu
 sparky-xterm (>= 0.2.0)

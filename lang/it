@@ -1,7 +1,7 @@
 # File di localizzazione italiano per Sparky Backup Sys.
 # Copyright 2018 Carlo Troiani <carl.troiani@gmail.com> 2018/04/11
 # Rilasciato sotto licenza GNU GPL v2
-# Ultimo aggiornamento 2018/04/11 by carlo
+# Ultimo aggiornamento 2018/06/07 by pavroo
 LOCAL1="Devi essere root..."
 LOCAL2="Sto uscendo..."
 LOCAL3="Sei su di un sistema live!"
@@ -83,5 +83,6 @@ LOCAL78="Dove il nome utente e' un utente valido del sistema"
 LOCAL79="Sto pulendo /etc/skel dai file che andremo a sovrascrivere"
 LOCAL80="Sto copiando i file di configurazione in /etc/skel"
 LOCAL81="o non e' stato trovato o non ha una cartella home appropriata."
+LOCAL82="Questo copierà le impostazioni del desktop per l'utente dal vivo"
 ### desktop entry can be translate too ###
 # Comment[it_IT]=Strumentto di SparkyLinux per effettuare backup di sistema

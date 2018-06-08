@@ -1,7 +1,7 @@
 # German localization file for Sparky Backup Sys by Det Bertling.
 # Copyright 2018 PaweÅ‚ "pavroo" Pijanowski <pavroo@onet.eu> 2018/03/27
 # Under the GNU GPL v2
-# Last update 2018/03/27 by pavroo
+# Last update 2018/06/07 by pavroo
 LOCAL1="root ist erforderlich..."
 LOCAL2="Beende jetzt..."
 LOCAL3="Das ist das Live System!"
@@ -83,5 +83,6 @@ LOCAL78="Wo der Nutzername ein gültiger Nutzer des Systems ist"
 LOCAL79="Bereinigen /etc/skel von den Dateien wird überkopieren"
 LOCAL80="Kopiere Konfigurationsdateien nach /etc/skel"
 LOCAL81="entweder nicht gefunden oder hat kein gültiges Homeverzeichnis."
+LOCAL82="Dies kopiert Ihre Desktop-Einstellungen für den Live-Benutzer"
 ### Desktop-Eintrag kann übersetzt werden nach ###
 # Comment[de_DE]=SparkyLinux system backup tool
