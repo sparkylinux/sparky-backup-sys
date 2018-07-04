@@ -9,7 +9,7 @@
 #
 # Forked for SparkyLinux by pavroo <pavroo@onet.eu> 2013/08/05
 # Copyright 2013-2018 Under the GNU GPL2 License
-# Last update 2018/06/07
+# Last update 2018/07/04
 #
 # This script requires yad to run
 
@@ -64,11 +64,13 @@ fi
 
 # if Live system just quit, do nothing
 TESTMODE=`grep "1000" /etc/passwd | grep -v "Live"`
-
 if [ "$TESTMODE" = "" ]; then
 	$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"$LOCAL3\n$LOCAL4\n\n$LOCAL2"
 	exit 1
 fi
+
+. /etc/sparkybackup/sparkybackup.conf
+. /etc/sparkybackup/sparkybackup.version
 
 mainmenu () {
 
@@ -104,7 +106,7 @@ elif [ "$CHOICE" = "Installer" ]; then
 elif [ "$CHOICE" = "Cache" ]; then
 	cachemenu
 elif [ "$CHOICE" = "Log" ]; then
-. /etc/sparkybackup/sparkybackup.conf
+#. /etc/sparkybackup/sparkybackup.conf
 	if [ -f "$WORKDIR/sparkybackup-sys/sparkybackup.log" ]; then
 		$DIALOG $TITLE"$TITLETEXT" --width=600 --height=400 --text-info --filename="$WORKDIR/sparkybackup-sys/sparkybackup.log"
 	else
@@ -112,7 +114,7 @@ elif [ "$CHOICE" = "Log" ]; then
 	fi
 mainmenu
 elif [ "$CHOICE" = "Info" ]; then
-. /etc/sparkybackup/sparkybackup.version
+#. /etc/sparkybackup/sparkybackup.version
 $DIALOG550 $TITLE"$TITLETEXT" $MSGBOX $TEXT"$LOCAL15 \n\
 $LOCAL16 \n\
 $LOCAL17 \n\
@@ -133,7 +135,7 @@ $LOCAL27 $SPARKYBACKUPVERSION \n\
 $LOCAL28 https://sparkylinux.org/forum"
 mainmenu
 elif [ "$CHOICE" = "EFI" ]; then
-. /etc/sparkybackup/sparkybackup.version
+#. /etc/sparkybackup/sparkybackup.version
 $DIALOG550 $TITLE"$TITLETEXT" $MSGBOX $TEXT"$LOCAL29 \n\
 $LOCAL30 \n\n\
 1. $LOCAL31 \n\
@@ -238,7 +240,7 @@ if [ "$?" != "0" ]; then
 
 else
 
-. /etc/sparkybackup/sparkybackup.conf
+#. /etc/sparkybackup/sparkybackup.conf
 	$SPARKYXTERM "sparkybackup dist"
 
 	SQUASHFSSIZE=`ls -s $WORKDIR/sparkybackup-sys/ISOTMP/live/filesystem.squashfs | awk -F " " '{print $1}'`
