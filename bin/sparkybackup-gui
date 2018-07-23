@@ -9,14 +9,14 @@
 #
 # Forked for SparkyLinux by pavroo <pavroo@onet.eu> 2013/08/05
 # Copyright 2013-2018 Under the GNU GPL2 License
-# Last update 2018/07/04
-#
-# This script requires yad to run
+# Last update 2018/07/23
 
 # get default's locale file
 DEFLOCDIR="/usr/share/sparky/sparky-backup-sys"
 if [ "`cat /etc/default/locale | grep de_DE`" != "" ]; then
 . $DEFLOCDIR/de
+elif [ "`cat /etc/default/locale | grep id_ID`" != "" ]; then
+. $DEFLOCDIR/id_ID
 elif [ "`cat /etc/default/locale | grep it_IT`" != "" ]; then
 . $DEFLOCDIR/it
 elif [ "`cat /etc/default/locale | grep pl_PL`" != "" ]; then
@@ -106,7 +106,6 @@ elif [ "$CHOICE" = "Installer" ]; then
 elif [ "$CHOICE" = "Cache" ]; then
 	cachemenu
 elif [ "$CHOICE" = "Log" ]; then
-#. /etc/sparkybackup/sparkybackup.conf
 	if [ -f "$WORKDIR/sparkybackup-sys/sparkybackup.log" ]; then
 		$DIALOG $TITLE"$TITLETEXT" --width=600 --height=400 --text-info --filename="$WORKDIR/sparkybackup-sys/sparkybackup.log"
 	else
@@ -114,7 +113,6 @@ elif [ "$CHOICE" = "Log" ]; then
 	fi
 mainmenu
 elif [ "$CHOICE" = "Info" ]; then
-#. /etc/sparkybackup/sparkybackup.version
 $DIALOG550 $TITLE"$TITLETEXT" $MSGBOX $TEXT"$LOCAL15 \n\
 $LOCAL16 \n\
 $LOCAL17 \n\
@@ -135,7 +133,6 @@ $LOCAL27 $SPARKYBACKUPVERSION \n\
 $LOCAL28 https://sparkylinux.org/forum"
 mainmenu
 elif [ "$CHOICE" = "EFI" ]; then
-#. /etc/sparkybackup/sparkybackup.version
 $DIALOG550 $TITLE"$TITLETEXT" $MSGBOX $TEXT"$LOCAL29 \n\
 $LOCAL30 \n\n\
 1. $LOCAL31 \n\
@@ -286,20 +283,7 @@ if [ "$?" != "0" ]; then
 
 else
 
-	#if [ -d /etc/skel ]; then
-	#	rm -rf /etc/skel
-	#	mkdir /etc/skel
-	#fi
-
-	#if [ -d /usr/share/sparky-desktop-data/openbox/skel ]; then
-	#	cp /usr/share/sparky-desktop-data/openbox/skel/.bash_logout /etc/skel/.bash_logout
-	#	cp /usr/share/sparky-desktop-data/openbox/skel/.bashrc /etc/skel/.bashrc
-	#	cp /usr/share/sparky-desktop-data/openbox/skel/.profile /etc/skel/.profile
-	#fi
-
-	#rm -rf /home/sparkybackup-sys
 	rm -rf $WORKDIR
-
 	$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"$LOCAL75 \n$LOCAL51"
 fi
 
