@@ -4,6 +4,7 @@ Encoding=UTF-8
 Name=Sparky Backup System
 GenericName=Sparky Backup System
 Comment=SparkyLinux system backup tool
+Comment[fr]=Outil de sauvegarde système de SparkyLinux
 Comment[id]=Tool Backup Sistem SparkyLinux
 Comment[it]=Strumentto di SparkyLinux per effettuare backup di sistema
 Comment[pl]=Narzędzie do tworzenia kopii zapasowej SparkyLinux
