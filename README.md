@@ -2,7 +2,7 @@ Sparky Backup System
 
 This tool lets you create a hybrid ISO image from your SparkyLinux installation. The package provides a YAD-based GUI for the sparky-backup-core.
 
-Copyright (C) 2012-2018 Paweł "pavroo" Pijanowski <pavroo@onet.eu> 
+Copyright (C) 2012-2019 Paweł "pavroo" Pijanowski <pavroo@onet.eu> 
 under GNU GPLv3
 
 The tool is forked from Remastersys & Remastersys-GUI
