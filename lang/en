@@ -1,7 +1,7 @@
 # English localization file for Sparky Backup Sys.
 # Copyright 2018 Paweł "pavroo" Pijanowski <pavroo@onet.eu> 2018/03/27
 # Under the GNU GPL v2
-# Last update 2018/06/07 by pavroo
+# Last update 2019/06/16 by pavroo
 LOCAL1="Must be root..."
 LOCAL2="Exiting now..."
 LOCAL3="It's Live system!"
@@ -51,7 +51,7 @@ LOCAL46="Nothing has been done!"
 LOCAL47="Click OK to close the window."
 LOCAL48="Please select a user whose settings"
 LOCAL49="you would like to make the default."
-LOCAL50="The user you chose does not have a proper home directory."
+LOCAL50="The user you choose does not have a proper home directory."
 LOCAL51="Click OK to return to the main menu."
 LOCAL52="Copying the user:"
 LOCAL53="settings now."
