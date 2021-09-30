@@ -28,13 +28,16 @@ apt
 bash
 coreutils
 gawk
-gparted
 grep
 sparky-backup-core (>= 20180607)
 sparky-editor
 sparky-remsu
 sparky-xterm (>= 0.2.0)
 yad
+
+Suggests (for Advanced Installer =< Sparky 6):
+--------------
+gparted
 
 Conflicts:
 --------------
