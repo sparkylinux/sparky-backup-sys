@@ -1,6 +1,6 @@
 Upstream Author(s): 
     Files: *
-    Copyright (C) 2012-2022 Paweł "pavroo" Pijanowski <pavroo@onet.eu>
+    Copyright (C) 2012-2023 Paweł "pavroo" Pijanowski <pavroo@onet.eu>
     Under GNU GPLv3
 
     The tool is forked from Remastersys & Remastersys-GUI
@@ -48,6 +48,10 @@ Upstream Author(s):
     Copyright 2019 ChourS2008
     License: GNU GPL-3
 
+    File: uk
+    Copyright 2023 XalisRatt
+    License: GNU GPL-3
+    
 License:
 
     This package is free software; you can redistribute it and/or modify

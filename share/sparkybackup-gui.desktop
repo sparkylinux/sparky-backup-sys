@@ -12,6 +12,7 @@ Comment[it]=Strumento per backup del sistema SparkyLinux
 Comment[pl]=Narzędzie do tworzenia kopii zapasowej SparkyLinux
 Comment[pt_PT]=Ferramenta de cópias de segurança do SparkyLinux
 Comment[ru]=SparkyLinux инструмент для резервного копирования системы
+Comment[uk]=Резервне копіювання системи SparkyLinux
 Exec=remsu /usr/bin/sparkybackup-gui
 Icon=/usr/share/icons/sparky/sparkybackupsys/sparky.png
 Terminal=false
