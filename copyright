@@ -1,6 +1,6 @@
 Upstream Author(s): 
     Files: *
-    Copyright (C) 2012-2023 Paweł "pavroo" Pijanowski <pavroo@onet.eu>
+    Copyright (C) 2012-2024 Paweł "pavroo" Pijanowski <pavroo@onet.eu>
     Under GNU GPLv3
 
     The tool is forked from Remastersys & Remastersys-GUI
@@ -22,6 +22,10 @@ Upstream Author(s):
     File: es_ES
     Copyright 2022 depaz
     License: GNU GPL-3
+    
+    File: fi
+    Copyright (C) 2024 Jouko Tiilikainen
+    License: GPL-2
     
     File: fr
     Copyright (C) 2018 Jean-Albert Caire
